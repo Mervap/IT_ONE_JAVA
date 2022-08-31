@@ -46,7 +46,7 @@ public class RawRepository {
       var columnsWithKeys = jdbcTemplate.query("show columns from " + name, new ColumnMapper());
       var columns = columnsWithKeys.stream().map(it -> it.info).collect(Collectors.toList());
       var keyColumn = columnsWithKeys.stream().filter(it -> it.isPrimary).findFirst().get().info.getName();
-      return Optional.of(new DBTable(name, columns.size(), keyColumn, columns));
+      return Optional.of(new DBTable(name, columns.size(), keyColumn.toLowerCase(), columns));
     } catch (Exception e) {
       log.error(e.getMessage());
       return Optional.empty();

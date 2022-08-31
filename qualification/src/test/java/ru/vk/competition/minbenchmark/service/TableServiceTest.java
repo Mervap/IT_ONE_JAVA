@@ -128,7 +128,7 @@ public class TableServiceTest {
     }
     return Pair.of(
       new DBTable(name, columnsAmount, primaryKey, testColumns),
-      new DBTable(name, verifyColumns.size(), primaryKey.toUpperCase(), verifyColumns)
+      new DBTable(name, verifyColumns.size(), primaryKey.toLowerCase(), verifyColumns)
     );
   }
 
