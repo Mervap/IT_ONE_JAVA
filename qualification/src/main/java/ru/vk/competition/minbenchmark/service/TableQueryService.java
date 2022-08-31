@@ -37,7 +37,7 @@ public class TableQueryService {
   }
 
   public Mono<TableQuery> getQueryById(int id) {
-    return Mono.fromCallable(() -> repo.getQueryById(id)).flatMap(Mono::justOrEmpty);
+    return Mono.fromCallable(() -> repo.getTableQueryById(id)).flatMap(Mono::justOrEmpty);
   }
 
   public Mono<List<TableQuery>> getAllTableQueries() {

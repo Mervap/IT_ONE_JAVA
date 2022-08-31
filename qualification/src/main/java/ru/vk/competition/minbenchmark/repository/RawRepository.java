@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.vk.competition.minbenchmark.entity.ColumnInfo;
 import ru.vk.competition.minbenchmark.entity.DBTable;
+import ru.vk.competition.minbenchmark.entity.SingleQuery;
 import ru.vk.competition.minbenchmark.entity.TableQuery;
 
 import java.sql.ResultSet;
@@ -28,6 +29,7 @@ public class RawRepository {
   private final JdbcTemplate jdbcTemplate;
   private final ConcurrentSkipListSet<String> cachedTableNames = new ConcurrentSkipListSet<>();
   private final ConcurrentHashMap<Integer, TableQuery> queries = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<Integer, SingleQuery> singleQueries = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, ConcurrentSkipListSet<Integer>> tableQueries = new ConcurrentHashMap<>();
 
   public boolean createTable(DBTable table) {
@@ -79,7 +81,7 @@ public class RawRepository {
     }
 
     int id = query.getId();
-    if (queries.containsKey(id)) {
+    if (queries.containsKey(id) || singleQueries.containsKey(id)) {
       log.error("Cannot add new table query: id already exists " + id);
       return false;
     }
@@ -142,7 +144,7 @@ public class RawRepository {
     return Optional.of(tableQueries.get(name).stream().map(queries::get).collect(Collectors.toList()));
   }
 
-  public Optional<TableQuery> getQueryById(int id) {
+  public Optional<TableQuery> getTableQueryById(int id) {
     if (!queries.containsKey(id)) {
       return Optional.empty();
     }
@@ -154,8 +156,68 @@ public class RawRepository {
     return queries.values();
   }
 
+  public boolean newSingleQuery(SingleQuery query) {
+    int id = query.getId();
+    if (singleQueries.containsKey(id) || queries.containsKey(id)) {
+      log.error("Cannot add new single query: id already exists " + id);
+      return false;
+    }
+    singleQueries.put(id, query);
+    return true;
+  }
+
+  public boolean updateSingleQuery(SingleQuery query) {
+    int id = query.getId();
+    if (!singleQueries.containsKey(id)) {
+      log.error("Cannot update single query: id not exists " + id);
+      return false;
+    }
+
+    singleQueries.put(id, query);
+    return true;
+  }
+
+  public boolean deleteSingleQuery(int id) {
+    if (!singleQueries.containsKey(id)) {
+      log.error("Cannot delete single query: id not exists " + id);
+      return false;
+    }
+
+    singleQueries.remove(id);
+    return true;
+  }
+
+  public boolean executeSingleQuery(int id) {
+    var query = singleQueries.get(id);
+    if (query == null) {
+      log.error("Cannot execute single query: id not exists " + id);
+      return false;
+    }
+
+    try {
+      jdbcTemplate.execute(query.getQuery());
+      return true;
+    } catch (Exception e) {
+      log.warn("Cannot execute single query " + id + ": " + e.getMessage());
+      return false;
+    }
+  }
+
+  public Optional<SingleQuery> getSingleQueryById(int id) {
+    if (!singleQueries.containsKey(id)) {
+      return Optional.empty();
+    }
+
+    return Optional.of(singleQueries.get(id));
+  }
+
+  public Collection<SingleQuery> getAllSingleQueries() {
+    return singleQueries.values();
+  }
+
   public void clear() {
     queries.clear();
+    singleQueries.clear();
     tableQueries.clear();
     for (var table : cachedTableNames) {
       dropTable(table);

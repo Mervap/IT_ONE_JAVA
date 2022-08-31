@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import ru.vk.competition.minbenchmark.controller.ControllerWithCounter;
@@ -25,7 +27,7 @@ public class TableQueryController extends ControllerWithCounter {
   public Mono<ResponseEntity<Void>> addNewTableQuery(@RequestBody TableQuery query) {
     var id = nextId();
     log.info(withId(id, "Add table query: " + query.toString()));
-    return toHttpStatus(queryService.addNewTableQuery(query).publishOn(Schedulers.boundedElastic())).map(it -> {
+    return toHttpStatus(queryService.addNewTableQuery(query).publishOn(Schedulers.boundedElastic()), HttpStatus.CREATED).map(it -> {
       log.info(withId(id, "Add table query result: " + it.getStatusCodeValue()));
       return it;
     });
@@ -55,7 +57,7 @@ public class TableQueryController extends ControllerWithCounter {
   public Mono<ResponseEntity<Void>> executeTableQuery(@PathVariable Integer id) {
     var queryId = nextId();
     log.info(withId(queryId, "Execute table query: " + id));
-    return toHttpStatus(queryService.executeTableQuery(id).publishOn(Schedulers.boundedElastic())).map(it -> {
+    return toHttpStatus(queryService.executeTableQuery(id).publishOn(Schedulers.boundedElastic()), HttpStatus.CREATED).map(it -> {
       log.info(withId(queryId, "Execute table query result: " + it.getStatusCodeValue()));
       return it;
     });
@@ -79,5 +81,14 @@ public class TableQueryController extends ControllerWithCounter {
       log.info(withId(queryId, "Get all table queries result: " + it.toString()));
       return it;
     });
+  }
+
+  @ExceptionHandler(ServerWebInputException.class)
+  ResponseEntity<Void> badQuery(ServerWebInputException ex) {
+    throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ex.getReason(), ex.getCause());
+  }
+
+  protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok) {
+    return toHttpStatus(res, ok, HttpStatus.NOT_ACCEPTABLE);
   }
 }

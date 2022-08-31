@@ -18,16 +18,13 @@ public class ControllerWithCounter {
     return id + ") " + s;
   }
 
-  protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res) {
-    return toHttpStatus(res, HttpStatus.CREATED);
-  }
 
-  protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok) {
+  protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok, HttpStatus error) {
     return res.map(isOk -> {
       if (isOk) {
         return new ResponseEntity<>(ok);
       } else {
-        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Bad query");
+        throw new ResponseStatusException(error, "Bad query");
       }
     });
   }
