@@ -19,6 +19,11 @@ public class TableService {
   }
 
   public Mono<Boolean> createTable(DBTable table) {
+    if (table.getColumnsAmount() != table.getColumnInfos().size()) {
+      log.info("Bad columns amount");
+      return Mono.just(false);
+    }
+
     if (isNotAsciiOnly(table.getName())) {
       log.info("Bad table name");
       return Mono.just(false);

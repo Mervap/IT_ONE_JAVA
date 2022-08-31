@@ -77,6 +77,13 @@ public class TableServiceTest {
   }
 
   @Test
+  void createBadAmount() {
+    var db = createTestTable(TEST_TABLE, 33, "id", ID_COLUMN).getFirst();
+
+    StepVerifier.create(tableService.createTable(db)).expectNext(false).verifyComplete();
+  }
+
+  @Test
   void getNonExisting() {
     var db = createTestTable(TEST_TABLE, "id", ID_COLUMN).getFirst();
 
