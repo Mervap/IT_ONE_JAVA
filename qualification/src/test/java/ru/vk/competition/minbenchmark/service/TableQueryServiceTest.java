@@ -58,6 +58,12 @@ public class TableQueryServiceTest {
   }
 
   @Test
+  void addNewQueryTooBig() {
+    var query = new TableQuery(1, "Test", "select * from Test" + "r".repeat(140));
+    StepVerifier.create(queryService.addNewTableQuery(query)).expectNext(false).verifyComplete();
+  }
+
+  @Test
   void updateQuery() {
     var query1 = new TableQuery(1, "Test", "select id from Test");
     var query2 = new TableQuery(1, "Test", "select id, name from Test");
@@ -66,10 +72,35 @@ public class TableQueryServiceTest {
   }
 
   @Test
-  void updateQueryBadTableForId() {
+  void updateQueryTooBig() {
+    var query1 = new TableQuery(1, "Test", "select * from Test");
+    var query2 = new TableQuery(1, "Test", "select * from Test" + "r".repeat(140));
+    StepVerifier.create(queryService.addNewTableQuery(query1)).expectNext(true).verifyComplete();
+    StepVerifier.create(queryService.updateTableQuery(query2)).expectNext(false).verifyComplete();
+  }
+
+  @Test
+  void updateQueryChangeTable() {
     var query1 = new TableQuery(1, "Test", "select * from Test");
     var query2 = new TableQuery(1, "Test1", "select id, name from Test");
+
     StepVerifier.create(queryService.addNewTableQuery(query1)).expectNext(true).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test")).expectNext(Collections.singletonList(query1)).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test1")).expectNext(Collections.emptyList()).verifyComplete();
+
+    StepVerifier.create(queryService.updateTableQuery(query2)).expectNext(true).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test")).expectNext(Collections.emptyList()).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test1")).expectNext(Collections.singletonList(query2)).verifyComplete();
+  }
+
+  void updateQueryChangeTableNotExists() {
+    var query1 = new TableQuery(1, "Test", "select * from Test");
+    var query2 = new TableQuery(1, "Test2", "select id, name from Test2");
+
+    StepVerifier.create(queryService.addNewTableQuery(query1)).expectNext(true).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test")).expectNext(Collections.singletonList(query1)).verifyComplete();
+    StepVerifier.create(queryService.getTableQueries("Test2")).verifyComplete();
+
     StepVerifier.create(queryService.updateTableQuery(query2)).expectNext(false).verifyComplete();
   }
 
@@ -176,4 +207,3 @@ public class TableQueryServiceTest {
     StepVerifier.create(queryService.getAllTableQueries()).expectNext(Collections.emptyList()).verifyComplete();
   }
 }
-

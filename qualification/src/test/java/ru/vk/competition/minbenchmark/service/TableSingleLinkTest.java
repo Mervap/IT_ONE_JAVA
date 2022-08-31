@@ -42,21 +42,13 @@ public class TableSingleLinkTest {
   }
 
   @Test
-  void differentId() {
-    var query1 = new TableQuery(1, "Test", "select * from Test");
-    var query2 = new SingleQuery(1, "select * from Test");
-    StepVerifier.create(tableQueryService.addNewTableQuery(query1)).expectNext(true).verifyComplete();
-    StepVerifier.create(singleQueryService.addNewQuery(query2)).expectNext(false).verifyComplete();
-  }
-
-  @Test
   void getAllDifferent() {
     var query1 = new TableQuery(1, "Test", "select * from Test");
     var query2 = new TableQuery(2, "Test", "select * from Test");
     var queryList1 = Arrays.asList(query1, query2);
 
-    var query3 = new SingleQuery(3, "select * from Test");
-    var query4 = new SingleQuery(4, "select * from Test");
+    var query3 = new SingleQuery(1, "select * from Test");
+    var query4 = new SingleQuery(2, "select * from Test");
     var queryList2 = Arrays.asList(query3, query4);
 
     StepVerifier.create(tableQueryService.addNewTableQuery(query1)).expectNext(true).verifyComplete();

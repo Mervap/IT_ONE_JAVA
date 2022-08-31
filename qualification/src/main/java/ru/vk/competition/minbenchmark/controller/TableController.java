@@ -19,12 +19,13 @@ import ru.vk.competition.minbenchmark.service.TableService;
 public class TableController extends ControllerWithCounter {
 
   private final TableService tableService;
+
   @GetMapping("/get-table-by-name/{name}")
   public Mono<DBTable> getTableByName(@PathVariable String name) {
     var id = nextId();
-    log.trace(withId(id,  "Get table: name = " + name));
+    log.info(withId(id, "Get table: name = " + name));
     return tableService.getTableByName(name).map(it -> {
-      log.trace(withId(id, "Get table succeeded: " + it.toString()));
+      log.info(withId(id, "Get table succeeded: " + it.toString()));
       return it;
     }).publishOn(Schedulers.boundedElastic());
   }
@@ -34,7 +35,10 @@ public class TableController extends ControllerWithCounter {
     var id = nextId();
     log.info(withId(id, "Create table: name = " + table.toString()));
     return toHttpStatus(tableService.createTable(table).publishOn(Schedulers.boundedElastic())).map(it -> {
-      log.trace(withId(id, "Create table result: " + it.getStatusCodeValue()));
+      if (it.getStatusCodeValue() == 201) {
+        log.info(withId(id, "Create table " + table.getName()));
+      }
+      log.info(withId(id, "Create table result: " + it.getStatusCodeValue()));
       return it;
     });
   }
@@ -44,7 +48,10 @@ public class TableController extends ControllerWithCounter {
     var id = nextId();
     log.info(withId(id, "Drop table: name = " + name));
     return toHttpStatus(tableService.dropTable(name).publishOn(Schedulers.boundedElastic())).map(it -> {
-      log.trace(withId(id, "Drop table result: " + it.getStatusCodeValue()));
+      if (it.getStatusCodeValue() == 201) {
+        log.info(withId(id, "Drop table " + name));
+      }
+      log.info(withId(id, "Drop table result: " + it.getStatusCodeValue()));
       return it;
     });
   }

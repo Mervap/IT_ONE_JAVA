@@ -20,11 +20,19 @@ public class ControllerWithCounter {
 
 
   protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok, HttpStatus error) {
+    return toHttpStatus(res, ok, error, true);
+  }
+
+  protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok, HttpStatus error, boolean th) {
     return res.map(isOk -> {
       if (isOk) {
         return new ResponseEntity<>(ok);
       } else {
-        throw new ResponseStatusException(error, "Bad query");
+        if (th) {
+          throw new ResponseStatusException(error, "Bad query");
+        } else {
+          return new ResponseEntity<>(error);
+        }
       }
     });
   }

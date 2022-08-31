@@ -12,20 +12,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import ru.vk.competition.minbenchmark.controller.query.*;
+import ru.vk.competition.minbenchmark.controller.query.SingleQueryController;
+import ru.vk.competition.minbenchmark.controller.query.SingleQueryController400;
+import ru.vk.competition.minbenchmark.controller.query.SingleQueryController500;
 import ru.vk.competition.minbenchmark.entity.SingleQuery;
-import ru.vk.competition.minbenchmark.entity.TableQuery;
 import ru.vk.competition.minbenchmark.service.SingleQueryService;
-import ru.vk.competition.minbenchmark.service.TableQueryService;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = { SingleQueryController.class, SingleQueryController400.class, SingleQueryController500.class })
+@WebFluxTest(controllers = {SingleQueryController.class, SingleQueryController400.class, SingleQueryController500.class})
 class SingleQueryControllerTest {
   @Autowired
   private WebTestClient webClient;
@@ -150,6 +151,7 @@ class SingleQueryControllerTest {
       .uri("/api/single-query/get-single-query-by-id/azaza").exchange()
       .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
   @Test
   void getAllQueries() throws JsonProcessingException {
     var query1 = new SingleQuery(1, "select * from Test");

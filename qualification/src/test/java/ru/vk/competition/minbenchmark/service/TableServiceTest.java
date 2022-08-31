@@ -24,7 +24,7 @@ public class TableServiceTest {
 
   @AfterEach
   void cleanDB() {
-    tableService.dropTable(TEST_TABLE).block();
+    tableService.clear();
   }
 
   @Test
@@ -43,7 +43,7 @@ public class TableServiceTest {
 
   @Test
   void createBadTableName() {
-    var db = createTestTable("TestЛОЛ", "id", ID_COLUMN).getFirst();
+    var db = createTestTable("+++Test+++", "id", ID_COLUMN).getFirst();
 
     StepVerifier.create(tableService.createTable(db)).expectNext(false).verifyComplete();
   }

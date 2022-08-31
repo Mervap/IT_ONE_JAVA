@@ -85,10 +85,11 @@ public class TableQueryController extends ControllerWithCounter {
 
   @ExceptionHandler(ServerWebInputException.class)
   ResponseEntity<Void> badQuery(ServerWebInputException ex) {
+    log.info("Handle bad query: " + ex.getMethodParameter() + " " + ex);
     throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ex.getReason(), ex.getCause());
   }
 
   protected Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res, HttpStatus ok) {
-    return toHttpStatus(res, ok, HttpStatus.NOT_ACCEPTABLE);
+    return toHttpStatus(res, ok, HttpStatus.NOT_ACCEPTABLE, true);
   }
 }

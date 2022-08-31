@@ -35,6 +35,7 @@ public class SingleQueryController500 extends ControllerWithCounter {
 
   @ExceptionHandler(ServerWebInputException.class)
   ResponseEntity<Void> badQuery(ServerWebInputException ex) {
+    log.info("Handle bad single query500: " + ex.getMethodParameter() + " " + ex);
     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getReason(), ex.getCause());
   }
 

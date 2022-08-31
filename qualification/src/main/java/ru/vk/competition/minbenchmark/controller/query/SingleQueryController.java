@@ -67,6 +67,7 @@ public class SingleQueryController extends ControllerWithCounter {
 
   @ExceptionHandler(ServerWebInputException.class)
   ResponseEntity<Void> badQuery(ServerWebInputException ex) {
+    log.info("Handle bad single query: " + ex.getMethodParameter() + " " + ex);
     throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ex.getReason(), ex.getCause());
   }
 

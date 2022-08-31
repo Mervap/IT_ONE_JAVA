@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = { TableQueryController.class, TableQueryController500.class })
+@WebFluxTest(controllers = {TableQueryController.class, TableQueryController500.class})
 class TableQueryControllerTest {
   @Autowired
   private WebTestClient webClient;
