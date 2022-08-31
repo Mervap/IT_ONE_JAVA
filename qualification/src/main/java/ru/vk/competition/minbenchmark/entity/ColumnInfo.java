@@ -1,9 +1,7 @@
 package ru.vk.competition.minbenchmark.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import javax.persistence.Id;
 
@@ -13,6 +11,9 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class ColumnInfo {
   @Id
+  @NonNull
+  @JsonProperty("title")
   private String name;
+  @NonNull
   private String type;
 }

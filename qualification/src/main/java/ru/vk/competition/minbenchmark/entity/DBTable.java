@@ -1,10 +1,7 @@
 package ru.vk.competition.minbenchmark.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,9 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DBTable {
+  @NonNull
   @JsonProperty("tableName")
   private String name;
-  private Integer columnsAmount;
+  private int columnsAmount;
+  @NonNull
   private String primaryKey;
+  @NonNull
   private List<ColumnInfo> columnInfos;
 }
