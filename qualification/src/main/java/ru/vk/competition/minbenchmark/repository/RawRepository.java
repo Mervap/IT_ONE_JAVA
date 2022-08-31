@@ -26,7 +26,7 @@ public class RawRepository {
       jdbcTemplate.execute(buildCreateTableQuery(table));
       return true;
     } catch (Exception e) {
-      log.error(e.getMessage());
+      log.error("Cannot create table '" + table.getName() + "': " + e.getMessage());
       return false;
     }
   }
@@ -36,7 +36,7 @@ public class RawRepository {
       jdbcTemplate.execute("DROP TABLE " + name);
       return true;
     } catch (Exception e) {
-      log.error(e.getMessage());
+      log.error("Cannot drop table '" + name + "': " + e.getMessage());
       return false;
     }
   }

@@ -10,6 +10,8 @@ import reactor.core.scheduler.Schedulers;
 import ru.vk.competition.minbenchmark.entity.DBTable;
 import ru.vk.competition.minbenchmark.service.TableService;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/table")
@@ -17,23 +19,36 @@ import ru.vk.competition.minbenchmark.service.TableService;
 public class TableController {
 
   private final TableService tableService;
+  private final AtomicInteger counter = new AtomicInteger();
 
   @GetMapping("/get-table-by-name/{name}")
   public Mono<DBTable> getTableByName(@PathVariable String name) {
-    log.info("Get table: name = " + name);
-    return tableService.getTableByName(name).publishOn(Schedulers.boundedElastic());
+    var id = counter.getAndIncrement();
+    log.info(id + ") Get table: name = " + name);
+    return tableService.getTableByName(name).map(it -> {
+      log.info(id + ") Get table succeeded: " + it.toString());
+      return it;
+    }).publishOn(Schedulers.boundedElastic());
   }
 
   @PostMapping("/create-table")
   public Mono<ResponseEntity<Void>> createTable(@RequestBody DBTable table) {
-    log.info("Create table: name = " + table.toString());
-    return toHttpStatus(tableService.createTable(table).publishOn(Schedulers.boundedElastic()));
+    var id = counter.getAndIncrement();
+    log.info(id + ") Create table: name = " + table.toString());
+    return toHttpStatus(tableService.createTable(table).publishOn(Schedulers.boundedElastic())).map(it -> {
+      log.info(id + ") Create table result: " + it.getStatusCodeValue());
+      return it;
+    });
   }
 
   @DeleteMapping("/drop-table/{name}")
   public Mono<ResponseEntity<Void>> dropTable(@PathVariable String name) {
-    log.info("Drop table: name = " + name);
-    return toHttpStatus(tableService.dropTable(name).publishOn(Schedulers.boundedElastic()));
+    var id = counter.getAndIncrement();
+    log.info(id + ") Drop table: name = " + name);
+    return toHttpStatus(tableService.dropTable(name).publishOn(Schedulers.boundedElastic())).map(it -> {
+      log.info(id + ") Drop table result: " + it.getStatusCodeValue());
+      return it;
+    });
   }
 
   private Mono<ResponseEntity<Void>> toHttpStatus(Mono<Boolean> res) {

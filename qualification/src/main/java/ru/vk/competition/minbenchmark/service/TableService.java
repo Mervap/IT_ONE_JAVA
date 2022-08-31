@@ -20,22 +20,24 @@ public class TableService {
 
   public Mono<Boolean> createTable(DBTable table) {
     if (table.getColumnsAmount() != table.getColumnInfos().size()) {
-      log.info("Bad columns amount");
+      log.info("Fail to create table: bad columns amount: expected  " + table.getColumnsAmount() + ", actual: " + table.getColumnInfos().size());
       return Mono.just(false);
     }
 
     if (isNotAsciiOnly(table.getName())) {
-      log.info("Bad table name");
+      log.info("Fail to create table: bad table name '" + table.getName() + "'");
       return Mono.just(false);
     }
 
-    if (table.getColumnInfos().stream().anyMatch(it -> isNotAsciiOnly(it.getName()))) {
-      log.info("Bad column name");
-      return Mono.just(false);
+    for (var columnInfo : table.getColumnInfos()) {
+      if (isNotAsciiOnly(columnInfo.getName())) {
+        log.info("Fail to create table: bad column name '" + columnInfo.getName() + "'");
+        return Mono.just(false);
+      }
     }
 
     if (table.getColumnInfos().stream().noneMatch(it -> it.getName().equalsIgnoreCase(table.getPrimaryKey()))) {
-      log.info("Bad primary key");
+      log.info("Fail to create table: bad primary key '" + table.getPrimaryKey() + "'");
       return Mono.just(false);
     }
 
