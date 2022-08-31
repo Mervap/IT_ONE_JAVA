@@ -22,9 +22,9 @@ public class TableController extends ControllerWithCounter {
   @GetMapping("/get-table-by-name/{name}")
   public Mono<DBTable> getTableByName(@PathVariable String name) {
     var id = nextId();
-    log.warn(withId(id,  "Get table: name = " + name));
+    log.trace(withId(id,  "Get table: name = " + name));
     return tableService.getTableByName(name).map(it -> {
-      log.warn(withId(id, "Get table succeeded: " + it.toString()));
+      log.trace(withId(id, "Get table succeeded: " + it.toString()));
       return it;
     }).publishOn(Schedulers.boundedElastic());
   }
@@ -32,9 +32,9 @@ public class TableController extends ControllerWithCounter {
   @PostMapping("/create-table")
   public Mono<ResponseEntity<Void>> createTable(@RequestBody DBTable table) {
     var id = nextId();
-    log.warn(withId(id, "Create table: name = " + table.toString()));
+    log.info(withId(id, "Create table: name = " + table.toString()));
     return toHttpStatus(tableService.createTable(table).publishOn(Schedulers.boundedElastic())).map(it -> {
-      log.warn(withId(id, "Create table result: " + it.getStatusCodeValue()));
+      log.trace(withId(id, "Create table result: " + it.getStatusCodeValue()));
       return it;
     });
   }
@@ -42,9 +42,9 @@ public class TableController extends ControllerWithCounter {
   @DeleteMapping("/drop-table/{name}")
   public Mono<ResponseEntity<Void>> dropTable(@PathVariable String name) {
     var id = nextId();
-    log.warn(withId(id, "Drop table: name = " + name));
+    log.info(withId(id, "Drop table: name = " + name));
     return toHttpStatus(tableService.dropTable(name).publishOn(Schedulers.boundedElastic())).map(it -> {
-      log.warn(withId(id, "Drop table result: " + it.getStatusCodeValue()));
+      log.trace(withId(id, "Drop table result: " + it.getStatusCodeValue()));
       return it;
     });
   }

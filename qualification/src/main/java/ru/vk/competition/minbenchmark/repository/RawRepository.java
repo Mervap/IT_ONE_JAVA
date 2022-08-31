@@ -34,7 +34,7 @@ public class RawRepository {
 
   public boolean createTable(DBTable table) {
     if (cachedTableNames.contains(table.getName())) {
-      log.warn("Cannot create table: already in cache");
+      log.trace("Cannot create table: already in cache");
       return false;
     }
     try {
@@ -42,21 +42,21 @@ public class RawRepository {
       cachedTableNames.add(table.getName());
       return true;
     } catch (Exception e) {
-      log.warn("Cannot create table '" + table.getName() + "': " + e.getMessage());
+      log.trace("Cannot create table '" + table.getName() + "': " + e.getMessage());
       return false;
     }
   }
 
   public boolean dropTable(String name) {
     if (!cachedTableNames.remove(name)) {
-      log.warn("Cannot drop table: missed in cache");
+      log.trace("Cannot drop table: missed in cache");
       return false;
     }
     try {
       jdbcTemplate.execute("DROP TABLE " + name);
       return true;
     } catch (Exception e) {
-      log.warn("Cannot drop table '" + name + "': " + e.getMessage());
+      log.trace("Cannot drop table '" + name + "': " + e.getMessage());
       return false;
     }
   }
@@ -129,7 +129,7 @@ public class RawRepository {
       jdbcTemplate.execute(query.getQuery());
       return true;
     } catch (Exception e) {
-      log.warn("Cannot execute table query " + id + ": " + e.getMessage());
+      log.error("Cannot execute table query " + id + ": " + e.getMessage());
       return false;
     }
   }
@@ -198,7 +198,7 @@ public class RawRepository {
       jdbcTemplate.execute(query.getQuery());
       return true;
     } catch (Exception e) {
-      log.warn("Cannot execute single query " + id + ": " + e.getMessage());
+      log.error("Cannot execute single query " + id + ": " + e.getMessage());
       return false;
     }
   }
